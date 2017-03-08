@@ -4,7 +4,7 @@
 #  This software is distributed under the MIT Open Source License.
 #  <http://www.opensource.org/licenses/mit-license.html>
 #
-#  Permission is hereby granted, free of charge, to any person obtaining a 
+#  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
 #  to deal in the Software without restriction, including without limitation
 #  the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -14,12 +14,12 @@
 #  The above copyright notice and this permission notice shall be included
 #  in all copies or substantial portions of the Software.
 #
-#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-#  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 #  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-#  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+#  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 #  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-#  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
+#  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 #  IN THE SOFTWARE.
 
 
@@ -42,13 +42,13 @@ __all__ = 'AlphabeticArray', 'submatrix_alphabet', 'SubMatrix', 'Motif'
 class AlphabeticArray(object):
     """An alphabetic array. Wraps a numpy array so that each dimension
     can be associated with an alphabet and indexed with characters or strings.
-    
+
     Attributes :
     - alphabets -- A sequence of alphabets used to index the array
     - array     -- The underlying array object that is indexed.
-    
+
     Examples : 
-    
+
     >>> from corebio.seq import *
     >>> from corebio.matrix import AlphabeticArray
     >>>
@@ -72,11 +72,11 @@ class AlphabeticArray(object):
     ...
     >>> aa['A', 'B', 'ABCD']
     array([ 0,  0, 22,  0])
-    
-    
+
+
     Authors: 
     o GEC 2005, JXG 2006
-    
+
     """
     # Design note: Subclassing numpy arrays is hard, so instead we
     # build this proxy wrapper.
@@ -100,9 +100,10 @@ class AlphabeticArray(object):
         """
 
         # A dummy object to be used in place of None in the alphabets list
-        # so that we get meaningful error messages if we try to index a 
+        # so that we get meaningful error messages if we try to index a
         # nonalphabetic dimension with a string.
         class NullAlphabet(object):
+
             def ord(self, key):
                 raise IndexError('This dimension does not have an alphabet')
 
@@ -181,8 +182,8 @@ class AlphabeticArray(object):
         a.outerindex( (I,J,K) )[i,j,k] == a.array[I[i],J[j],K[k]]  
 
         """
-        # TODO: Above docstring is not very clear. 
-        # Deep voodoo using numpy indexing     
+        # TODO: Above docstring is not very clear.
+        # Deep voodoo using numpy indexing
         keys = self._ordkey(keys)
         outerkeys = []
         for i, k in enumerate(keys):
@@ -204,7 +205,7 @@ class AlphabeticArray(object):
 
     # The following code is designed to proxy all attributes
     # of the wrapped array. But I'm not entirely sure that this will work as
-    # intended.       
+    # intended.
     def __getattr__(self, name):
         try:
             return object.__getattr__(self, name)
@@ -221,7 +222,6 @@ class AlphabeticArray(object):
 # End class AlphabeticArray
 
 
-
 # TODO: move to seq?
 submatrix_alphabet = Alphabet("ARNDCQEGHILKMFPSTWYVBZX")
 
@@ -229,28 +229,27 @@ submatrix_alphabet = Alphabet("ARNDCQEGHILKMFPSTWYVBZX")
 class SubMatrix(AlphabeticArray):
     """A two dimensional array indexed by an Alphabet. Used to hold substitution
     matrices and similar information. 
-    
+
     Various standard substitution matrices are available from the data package
     >>> from corebio import data
     >>> mat = SubMatrix.read(data.data_stream('blosum100'))   
-    
+
     Attr:
     - alphabet     -- An Alphabet
     - array        -- A numpy array
     - name         -- The name of this matrix (if any) as a string.
     - description  -- The description, if any.
     - scale        -- The scale constant of a log-odds matrix, if known.     
-    
+
     Authors: 
     o GEC 2005, JXG 2006
-    
+
     """
     # TODO: __str__
     # TODO: __repr__
     # TODO: normalize
     # TODO: freq->log_odds (With additional ambiguity characters?)
-    # TODO: from_seqs   
-
+    # TODO: from_seqs
 
     __slots__ = ['alphabet', 'array', 'name', 'description', 'scale']
 
@@ -268,7 +267,7 @@ class SubMatrix(AlphabeticArray):
     @staticmethod
     def read(fin, alphabet=None, typeof=na.float64):
         """ Parse and return a substitution matrix
-        
+
         Arguments:
         - fin       --  matrix file 
         - alphabet  -- The set of substitution characters. Default: ''
@@ -316,7 +315,7 @@ class SubMatrix(AlphabeticArray):
                 cells = cells[:23]  # Chop off '*' state
             if len(cells) != L:
                 raise ValueError(
-                        "SubMatrix matrix parse error: line %d" % linenum)
+                    "SubMatrix matrix parse error: line %d" % linenum)
 
             for j in range(0, L):
                 matrix[i, j] = float(cells[j])
@@ -333,7 +332,7 @@ class SubMatrix(AlphabeticArray):
             for j in range(0, L):
                 if matrix[i, j] != matrix[j, i]:
                     raise ValueError(
-                            "Substitution matrix is asymmetric! (%d,%d)" % (i, j))
+                        "Substitution matrix is asymmetric! (%d,%d)" % (i, j))
 
         return SubMatrix(alphabet, matrix)
 
@@ -341,7 +340,7 @@ class SubMatrix(AlphabeticArray):
 
 
 # TODO
-# Separate PWM (Position weight matrix. (Log odds?) 
+# Separate PWM (Position weight matrix. (Log odds?)
 # , ICM (Information content matrix
 # , PFM (Position frequency matrix)
 
@@ -350,13 +349,13 @@ class Motif(AlphabeticArray):
     """A two dimensional array where the second dimension is indexed by an 
     Alphabet. Used to represent sequence motifs and similar information.
 
-    
+
     Attr:
     - alphabet     -- An Alphabet
     - array        -- A numpy array
     - name         -- The name of this motif (if any) as a string.
     - description  -- The description, if any.
-    
+
     """
 
     def __init__(self, alphabet, array=None, dtype=None, name=None,
@@ -459,7 +458,7 @@ class Motif(AlphabeticArray):
             for i, r in enumerate(items):
                 if not isint(r[0]) and r[0][0] != 'P':
                     raise ValueError(
-                            "Expected position as first item on line %d" % i)
+                        "Expected position as first item on line %d" % i)
                 r.pop(0)
                 defacto_alphabet = ''.join(header)
         else:
@@ -467,7 +466,7 @@ class Motif(AlphabeticArray):
             for i, r in enumerate(items):
                 if not ischar(r[0]) and r[0][0] != 'P':
                     raise ValueError(
-                            "Expected position as first item on line %d" % i)
+                        "Expected position as first item on line %d" % i)
                 a.append(r.pop(0))
             defacto_alphabet = ''.join(a)
 
@@ -495,7 +494,7 @@ class Motif(AlphabeticArray):
             for r in items:
                 r.pop()
 
-        # items should now be a list of lists of numbers (as strings) 
+        # items should now be a list of lists of numbers (as strings)
         rows = len(items)
         cols = len(items[0])
         matrix = na.zeros((rows, cols), dtype=na.float64)
@@ -507,3 +506,9 @@ class Motif(AlphabeticArray):
             matrix.transpose()
 
         return Motif(defacto_alphabet, matrix).reindex(alphabet)
+
+    @classmethod
+    def read_pwm(cls, pwm, in_alphabet='ACGT', out_alphabet='ACGT'):
+        # in_alphabet: the input alphabet order of pwm matrix
+        # reindent pwm with out_alphabet
+        return Motif(in_alphabet, pwm).reindex(out_alphabet)
